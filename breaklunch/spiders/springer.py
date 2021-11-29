@@ -5,18 +5,16 @@ class SpringerSpider(scrapy.Spider):
     name = 'springer'
     #计划爬取的域名列表，不在其中的无法爬取
     allowed_domains = ['springeropen.com']
-    #start_urls = ['https://www.springer.com/cn']
+    start_urls = ['https://www.springer.com/cn']
     #未爬取的url
     url_path="breaklunch/List/springer.txt"
     #已爬取的url
     url_done_path="breaklunch/List/springer_done.txt"
-
     def parse(self, response):
         
         #未爬取/已爬取的url
         url_list=[]
         url_done_list=[]
-        
         #读取url目录
         with open(self.url_path,'r',encoding='utf-8') as f:
             url_list=f.readlines()
