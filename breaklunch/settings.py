@@ -86,7 +86,7 @@ DOWNLOAD_DELAY = 2
 #定义pipeline，项目管道，数越小，优先度越高
 #可以一个管道爬取，一个管道下载或者爬取多个网站
 ITEM_PIPELINES = {
-    #'breaklunch.pipelines.BreaklunchPipeline': 300,
+    'breaklunch.pipelines.BreaklunchPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -109,3 +109,6 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+MONGODB_URI = "mongodb://localhost:27017"
+MONGODB_DB = "daoerxianqiao"
