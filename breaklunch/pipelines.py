@@ -40,6 +40,7 @@ class BreaklunchPipeline:
 
     def process_item(self, item, spider):
         # 视频基本信息
+        print(item)
         if 'foreign_id' in item:
             try:
                 self.db[self.collection[0]].insert_one(item)

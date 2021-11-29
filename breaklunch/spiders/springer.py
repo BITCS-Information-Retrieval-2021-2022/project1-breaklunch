@@ -28,6 +28,7 @@ class SpringerSpider(scrapy.Spider):
             
     #每个网址的解析
     def parse_page(self,response):
+        # print(response.url)
         pass
 
         #解析完成后将url加入已爬取目录
