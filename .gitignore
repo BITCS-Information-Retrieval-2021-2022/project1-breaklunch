@@ -1,2 +1,3 @@
 breaklunch/log/*.log
 breaklunch/.DS_Store
+breaklunch/spiders/__pycache__
