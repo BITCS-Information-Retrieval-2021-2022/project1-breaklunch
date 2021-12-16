@@ -9,7 +9,7 @@ from itemadapter import ItemAdapter
 import pymongo
 
 class BreaklunchPipeline:
-    collection = ['crossmind', 'crossmind_comment', 'crossmind_reaction', 'acl_anthology']
+    collection = ['springer_paper']
 
     def __init__(self, mongo_uri, mongo_db):
         self.mongo_uri = mongo_uri
@@ -28,8 +28,7 @@ class BreaklunchPipeline:
         self.client = pymongo.MongoClient(self.mongo_uri)
         self.db = self.client[self.mongo_db]
         # 创建索引 防止插入重复数据
-        self.db[self.collection[0]].create_index('foreign_id', unique=True)
-        self.db[self.collection[3]].create_index('Anthology ID', unique=True)
+        self.db[self.collection[0]].create_index('doi', unique=True)
         spider.logger.debug('连接MongoDB数据库:' + self.mongo_db)
 
 
@@ -40,22 +39,34 @@ class BreaklunchPipeline:
 
     def process_item(self, item, spider):
         # 视频基本信息
-        print("item is: "+item)
-        if 'foreign_id' in item:
+
+        print("________________________________________________")
+        print(item)
+        if 'doi' in item:
             try:
                 self.db[self.collection[0]].insert_one(item)
+                print("成功")
                 return item
             except Exception:
-                spider.logger.debug('视频基本信息出现重复')
+                spider.logger.debug('item出现重复')
                 return item
         # 视频本地路径
         elif 'video_path' in item:  # 注意 在acl中的视频路径是Video_path
+            print("vp:"+item['video_path'])
             self.db[self.collection[0]].update({'foreign_id': item['target_id']},
                                                {'$set': {'video_path': item['video_path']}})
         # pdf本地路径
         elif 'pdf_path' in item:  # 注意 在acl中的视频路径是Video_path
             self.db[self.collection[0]].update({'foreign_id': item['target_id']},
                                                {'$set': {'pdf_path': item['pdf_path']}})
+         # pdf url
+        elif 'pdf_url' in item:  #
+            print("nannana")
+            self.db[self.collection[0]].update({'foreign_id': item['target_id']},
+                                               {'$set': {'pdf_url': item['pdf_url']}}) # pdf url
+        elif 'authors' in item:  #
+            print("!!!!!!!!!!!!!!!")
+            print(item['authors'])
         # 评论信息
         elif 'content' in item:
             try:
@@ -89,4 +100,6 @@ class BreaklunchPipeline:
                     else:  # 除了PDF, 其他附件可能一类多个
                         self.db[self.collection[3]].update_one({'Anthology ID': item['Anthology ID']},
                                                                {'$addToSet': {k: v}})
+        else :
+            print()
         return item

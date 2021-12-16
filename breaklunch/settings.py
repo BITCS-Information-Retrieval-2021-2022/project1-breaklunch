@@ -111,4 +111,4 @@ ITEM_PIPELINES = {
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 MONGODB_URI = "mongodb://localhost:27017"
-MONGODB_DB = "daoerxianqiao"
+MONGODB_DB = "breaklunch"
