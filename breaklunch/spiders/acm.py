@@ -11,13 +11,15 @@ class ACMSpider(scrapy.Spider):
         'July': '7', 'August': '8', 'September': '9',
         'October': '10', 'November': '11', 'December': '12'
     }
+    # 下载的pdf编号，断点续爬记得改
     pdf_index = 1
     # 要包括文章所属板块
     pdf_download_path = 'breaklunch/pdf_download/acm_ai_'
+    # 用于debug
     debug_flag = True
 
     def start_requests(self):
-        # 起始url，按ACM的subject分类，在此基础上以被引用量排序
+        # 起始url，按ACM的subject分类，在此基础上按被引用量排序（引用量高的文章更有可能有视频）
         urls = [
             'https://dl.acm.org/subject/ai?sortBy=cited&startPage=0&pageSize=50'
             # 'https://dl.acm.org/subject/is?startPage=0&pageSize=50&sortBy=cited'
@@ -37,6 +39,11 @@ class ACMSpider(scrapy.Spider):
             except:
                 continue
 
+        # 爬完的页写入文档，以实现断点续爬
+        with open('breaklunch/List/acm_done.txt', 'a') as f:
+            f.write(response.url + '\n')
+
+        # 爬取下一页论文列表
         next_page = response.css('a.pagination__btn--next').attrib['href']
         if next_page is not None and self.debug_flag is True:
             # self.debug_flag = False
@@ -59,9 +66,9 @@ class ACMSpider(scrapy.Spider):
             url = response.url
 
             # 获取时间
-            date = response.css('span.epub-section__date::text').get().split(' ')
-            year = date[1]
-            month = self.month_dict[date[0]]
+            date = response.css('span.CitationCoverDate::text').get().split(' ')
+            year = date[2]
+            month = self.month_dict[date[1]]
 
             # 获取来源
             venue = response.css('nav.article__breadcrumbs.separator a:nth-child(3)').attrib['href'].split('/')[
@@ -98,35 +105,43 @@ class ACMSpider(scrapy.Spider):
                 pdf_path = None
 
             # 获取引用信息
-            in_citations = response.css('span.citation span:nth-child(2)::text').get()
+            in_citations = response.css('span.citation span:nth-child(2)::text').get().replace(',', '')
             out_citations_list = response.css('ol.rlist.references__list.references__numeric li')
+            if out_citations_list is None:
+                out_citations_list = response.css('ol.rlist.references__list li')
             if out_citations_list is not None:
                 out_citations = str(len(out_citations_list))
             else:
                 out_citations = str(0)
 
+            # 爬完的页写入文档，以实现断点续爬
+            with open('breaklunch/List/acm_done.txt', 'a') as f:
+                f.write(response.url + '\n')
+
+            # yield
+            yield {
+                'title': title,
+                'abstract': abstract,
+                'authors': authors,
+                'doi': doi,
+                'url': url,
+                'year': year,
+                'month': month,
+                'type': paper_type,
+                'venue': venue,
+                'source': source,
+                'video_url': video_url,
+                'video_path': video_path,
+                'thumbnail_path': thumbnail_path,
+                'pdf_url': pdf_url,
+                'pdf_path': pdf_path,
+                'inCitations': in_citations,
+                'outCitations': out_citations
+            }
+
         except:
             self.log(f"\n爬取信息处错，出错url为：{response.url}\n")
-
-        yield {
-            'title': title,
-            'abstract': abstract,
-            'authors': authors,
-            'doi': doi,
-            'url': url,
-            'year': year,
-            'month': month,
-            'type': paper_type,
-            'venue': venue,
-            'source': source,
-            'video_url': video_url,
-            'video_path': video_path,
-            'thumbnail_path': thumbnail_path,
-            'pdf_url': pdf_url,
-            'pdf_path': pdf_path,
-            'inCitations': in_citations,
-            'outCitations': out_citations
-        }
+            return
 
     def parse_pdf_download(self, response):
         # 下载pdf
