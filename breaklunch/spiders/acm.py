@@ -11,10 +11,8 @@ class ACMSpider(scrapy.Spider):
         'July': '7', 'August': '8', 'September': '9',
         'October': '10', 'November': '11', 'December': '12'
     }
-    # 下载的pdf编号，断点续爬记得改
-    pdf_index = 1
-    # 要包括文章所属板块
-    pdf_download_path = 'breaklunch/pdf_download/acm_ai_'
+    # pdf下载路径
+    pdf_download_path = 'breaklunch/acm_pdf_download/'
     # 用于debug
     debug_flag = True
 
@@ -97,7 +95,10 @@ class ACMSpider(scrapy.Spider):
             pdf_red_button = response.css('a.btn.red')
             if pdf_red_button is not None:
                 pdf_url = self.acm_prefix + pdf_red_button.attrib['href']
-                pdf_path = self.pdf_download_path + str(self.pdf_index) + '.pdf'
+                saved_title = title.replace('\\', '').replace('/', '').replace(':', '：')
+                saved_title = saved_title.replace('*', '').replace('?', '？').replace('"', '')
+                saved_title = saved_title.replace('<', '').replace('>', '').replace('|', '')
+                pdf_path = self.pdf_download_path + saved_title + '.pdf'
                 yield scrapy.Request(pdf_url, meta={'pdf_path': pdf_path},
                                      callback=self.parse_pdf_download, dont_filter=True)
             else:
@@ -107,7 +108,7 @@ class ACMSpider(scrapy.Spider):
             # 获取引用信息
             in_citations = response.css('span.citation span:nth-child(2)::text').get().replace(',', '')
             out_citations_list = response.css('ol.rlist.references__list.references__numeric li')
-            if out_citations_list is None:
+            if len(out_citations_list) == 0:
                 out_citations_list = response.css('ol.rlist.references__list li')
             if out_citations_list is not None:
                 out_citations = str(len(out_citations_list))
@@ -149,6 +150,5 @@ class ACMSpider(scrapy.Spider):
             path = response.meta['pdf_path']
             with open(path, 'wb') as f:
                 f.write(response.body)
-            self.pdf_index += 1
         except:
             self.log(f"\n下载pdf出错，出错url为：{response.url}\n")
