@@ -29,6 +29,77 @@ LOG_FILE="breaklunch/log/{}.{}.{}_{}.{}.{}.log".format(
 #设置虚假代理，防反爬
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36'
 
+USER_AGNET_LIST = [ 
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1" 
+        "Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11", 
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1092.0 Safari/536.6", 
+        "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1090.0 Safari/536.6", 
+        "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/19.77.34.5 Safari/537.1", 
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.9 Safari/536.5", 
+        "Mozilla/5.0 (Windows NT 6.0) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.5", 
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3", 
+        "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3", 
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3", 
+        "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3", 
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3", 
+        "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3", 
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3", 
+        "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3", 
+        "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.0 Safari/536.3", 
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24", 
+        "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24"
+    ]
+
+IP_LIST=[
+    "https://123.160.1.244:9999",
+    "https://115.221.241.114:9999",
+    "https://223.215.6.14:9999",
+    "https://1.196.177.67:9999",
+    "https://223.199.20.168:9999",
+    "https://114.99.5.7:9999",
+    "https://110.243.11.227:9999",
+    "https://218.73.118.194:9999",
+    "https://110.243.21.234:9999",
+    "https://183.166.97.158:9999",
+    "https://223.199.24.230:9999",
+    "https://223.199.28.237:9999",
+    "https://175.44.109.194:9999",
+    "https://58.212.43.145:9999",
+    "https://222.240.184.126:8086",
+    "https://117.64.237.142:9999",
+    "https://27.38.98.162:9797",
+    "https://122.228.19.7:3389",
+    "https://221.13.156.158:55443",
+    "https://58.244.52.175:8080",
+    "https://60.167.21.181:8118",
+    "https://111.160.169.54:42626",
+    "https://183.129.244.20:14153",
+    "https://153.101.64.50:12034",
+    "https://58.249.55.222:9797",
+    "https://114.99.15.150:6890",
+    "https://115.171.85.225:9000",
+    "https://123.160.1.244:9999",
+    "https://115.221.241.114:9999",
+    "https://223.215.6.14:9999",
+    "https://1.196.177.67:9999",
+    "https://223.199.20.168:9999",
+    "https://114.99.5.7:9999",
+    "https://110.243.11.227:9999",
+    "https://218.73.118.194:9999",
+    "https://110.243.21.234:9999",
+    "https://183.166.97.158:9999",
+    "https://223.199.24.230:9999",
+    "https://222.240.184.126:8086",
+    "https://223.199.28.237:9999",
+    "https://175.44.109.194:9999",
+    "https://58.212.43.145:9999",
+    "https://171.12.113.76:9999",
+    "https://114.99.25.98:18118",
+    "https://223.199.26.142:9999",
+    "https://223.199.18.98:9999",
+    "https://112.85.176.179:9999"
+]
+
 # Obey robots.txt rules
 #机器人协议，有些网站不让爬可以改为False
 ROBOTSTXT_OBEY = True
