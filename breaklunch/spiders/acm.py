@@ -27,12 +27,15 @@ class ACMSpider(scrapy.Spider):
 
         # 起始url，按ACM的subject分类，在此基础上按被引用量排序（引用量高的文章更有可能有视频）
         urls = [
-            'https://dl.acm.org/subject/se?startPage=0&pageSize=50&sortBy=cited'
-            'https://dl.acm.org/subject/theory?startPage=0&pageSize=50&sortBy=cited'
+            'https://dl.acm.org/subject/\
+                se?startPage=0&pageSize=50&sortBy=cited'
+            'https://dl.acm.org/subject/theory\
+                ?startPage=0&pageSize=50&sortBy=cited'
         ]
 
         for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse, dont_filter=True)
+            yield scrapy.Request(
+                url=url, callback=self.parse, dont_filter=True)
 
     def parse(self, response):
         # 爬取论文概况栏
@@ -43,23 +46,30 @@ class ACMSpider(scrapy.Spider):
             wait = random.randint(1, 10)
             time.sleep(wait * 0.1)
             try:
-                paper_url = self.acm_prefix + paper_item.css('span.hlFld-Title a').attrib['href']
+                paper_url = self.acm_prefix
+                + paper_item.css('span.hlFld-Title a').attrib['href']
                 if paper_url not in self.url_done_list:
-                    yield scrapy.Request(paper_url, callback=self.parse_paper_homepage, dont_filter=True)
+                    yield scrapy.Request(
+                        paper_url,
+                        callback=self.parse_paper_homepage,
+                        dont_filter=True)
                 else:
                     self.log(f"论文{paper_url}爬过了，本次跳过。\n")
-            except:
+            except Exception:
                 continue
 
         # 爬取下一页论文列表
         next_page = response.css('a.pagination__btn--next').attrib['href']
         if next_page is not None and self.debug_flag is True:
             # self.debug_flag = False
-            yield scrapy.Request(next_page, callback=self.parse, dont_filter=True)
+            yield scrapy.Request(
+                next_page, callback=self.parse, dont_filter=True)
 
     def parse_paper_homepage(self, response):
         # 获取breadcrumb信息，判断是否为会议期刊论文，如果是获取类型，如果不是不收集数据
-        paper_type_url = response.css('nav.article__breadcrumbs.separator a:nth-child(2)').attrib['href']
+        paper_type_url = response.css(
+            'nav.article__breadcrumbs.separator a:nth-child(2)'
+            ).attrib['href']
         if paper_type_url == '/journals' or paper_type_url == '/conferences':
             paper_type = paper_type_url[1:-1]
         else:
@@ -69,34 +79,46 @@ class ACMSpider(scrapy.Spider):
 
         # 获取title, abstract, authors, doi和url
         title = response.css('h1.citation__title::text').get()
-        abstract = response.css('div.abstractSection.abstractInFull p::text').get()
-        authors = response.css('span.loa__author-name span::text').getall()
+        abstract = response.css(
+            'div.abstractSection.abstractInFull p::text').get()
+        authors = response.css(
+            'span.loa__author-name span::text').getall()
         # doi = response.css('a.issue-item__doi').attrib['href']
         url = response.url
-        doi = url.replace('dl.acm.org/doi', 'doi.org')
+        doi = url.replace(
+            'dl.acm.org/doi', 'doi.org')
 
         # 获取时间
-        date = response.css('span.CitationCoverDate::text').get().split(' ')
+        date = response.css(
+            'span.CitationCoverDate::text').get().split(' ')
         year = date[2]
         month = self.month_dict[date[1]]
 
         # 获取来源
-        venue = response.css('nav.article__breadcrumbs.separator a:nth-child(3)').attrib['href'].split('/')[
+        venue = response.css(
+            'nav.article__breadcrumbs.separator a:nth-child(3)'
+            ).attrib['href'].split('/')[
             2].upper()
         source = 'ACM'
 
         # 获取视频相关信息
-        video_element = response.css('div.article-media__item.separated-block--dashed--bottom.clearfix')
+        video_element = response.css(
+            'div.article-media__item.separated-block--dashed--bottom.clearfix'
+            )
         if video_element is not None:
             try:
-                video_postfix = video_element.css('div.video__links.table__cell-view a:nth-child(2)').attrib['href']
+                video_postfix = video_element.css(
+                    'div.video__links.table__cell-view a:nth-child(2)'
+                    ).attrib['href']
                 video_url = self.acm_prefix + video_postfix
-            except:
+            except Exception:
                 video_url = None
             video_path = None
             try:
-                thumbnail_path = video_element.css('stream.cloudflare-stream-player').attrib['poster']
-            except:
+                thumbnail_path = video_element.css(
+                    'stream.cloudflare-stream-player'
+                    ).attrib['poster']
+            except Exception:
                 thumbnail_path = None
         else:
             video_url = None
@@ -109,25 +131,36 @@ class ACMSpider(scrapy.Spider):
             pdf_url = self.acm_prefix + pdf_red_button.attrib['href']
             # pdf_path = None
 
-            saved_title = title.replace('\\', '').replace('/', '').replace(':', '：')
-            saved_title = saved_title.replace('*', '').replace('?', '？').replace('"', '')
-            saved_title = saved_title.replace('<', '').replace('>', '').replace('|', '')
+            saved_title = title.replace('\\', '')\
+                .replace('/', '').replace(':', '：')
+            saved_title = saved_title.replace('*', '')\
+                .replace('?', '？').replace('"', '')
+            saved_title = saved_title.replace('<', '')\
+                .replace('>', '').replace('|', '')
             pdf_path = self.pdf_download_path + saved_title + '.pdf'
 
             wait = random.randint(1, 5)
             time.sleep(wait * 0.1)
 
-            yield scrapy.Request(pdf_url, meta={'pdf_path': pdf_path},
-                                 callback=self.parse_pdf_download, dont_filter=True)
+            yield scrapy.Request(
+                pdf_url, meta={'pdf_path': pdf_path},
+                callback=self.parse_pdf_download, dont_filter=True
+                )
         except KeyError:
             pdf_url = None
             pdf_path = None
 
         # 获取引用信息
-        in_citations = response.css('span.citation span:nth-child(2)::text').get().replace(',', '')
-        out_citations_list = response.css('ol.rlist.references__list.references__numeric li')
+        in_citations = response.css(
+            'span.citation span:nth-child(2)::text'
+            ).get().replace(',', '')
+        out_citations_list = response.css(
+            'ol.rlist.references__list.references__numeric li'
+            )
         if len(out_citations_list) == 0:
-            out_citations_list = response.css('ol.rlist.references__list li')
+            out_citations_list = response.css(
+                'ol.rlist.references__list li'
+                )
         if out_citations_list is not None:
             out_citations = str(len(out_citations_list))
         else:
@@ -164,5 +197,5 @@ class ACMSpider(scrapy.Spider):
             path = response.meta['pdf_path']
             with open(path, 'wb') as f:
                 f.write(response.body)
-        except:
+        except Exception:
             self.log(f"\n下载pdf出错，出错url为：{response.url}\n")

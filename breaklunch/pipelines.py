@@ -5,7 +5,7 @@
 
 
 # useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
+# from itemadapter import ItemAdapter
 import pymongo
 
 
@@ -50,7 +50,10 @@ class BreaklunchPipeline:
             except Exception:
                 spider.logger.debug('item出现重复,尝试更新')
                 try:
-                    self.db[self.collection[0]].update({'doi': item['doi']}, {"$set": {'abstract': item['abstract']}})
+                    self.db[self.collection[0]].update(
+                        {'doi': item['doi']},
+                        {"$set": {'abstract': item['abstract']}}
+                        )
                     print("更新成功")
                     return item
                 except Exception:
@@ -60,17 +63,23 @@ class BreaklunchPipeline:
         # 视频本地路径
         elif 'video_path' in item:  # 注意 在acl中的视频路径是Video_path
             print("vp:" + item['video_path'])
-            self.db[self.collection[0]].update({'foreign_id': item['target_id']},
-                                               {'$set': {'video_path': item['video_path']}})
+            self.db[self.collection[0]].update(
+                {'foreign_id': item['target_id']},
+                {'$set': {'video_path': item['video_path']}}
+                )
         # pdf本地路径
         elif 'pdf_path' in item:  # 注意 在acl中的视频路径是Video_path
-            self.db[self.collection[0]].update({'foreign_id': item['target_id']},
-                                               {'$set': {'pdf_path': item['pdf_path']}})
+            self.db[self.collection[0]].update(
+                {'foreign_id': item['target_id']},
+                {'$set': {'pdf_path': item['pdf_path']}}
+                )
         # pdf url
         elif 'pdf_url' in item:  #
             print("nannana")
-            self.db[self.collection[0]].update({'foreign_id': item['target_id']},
-                                               {'$set': {'pdf_url': item['pdf_url']}})  # pdf url
+            self.db[self.collection[0]].update(
+                {'foreign_id': item['target_id']},
+                {'$set': {'pdf_url': item['pdf_url']}}
+                )  # pdf url
         elif 'authors' in item:  #
             print("!!!!!!!!!!!!!!!")
             print(item['authors'])
@@ -103,10 +112,15 @@ class BreaklunchPipeline:
             for k, v in item.items():
                 if k != 'Anthology ID':
                     if k == 'PDF_path':
-                        self.db[self.collection[3]].update_one({'Anthology ID': item['Anthology ID']}, {'$set': {k: v}})
+                        self.db[self.collection[3]].update_one(
+                            {'Anthology ID': item['Anthology ID']},
+                            {'$set': {k: v}}
+                            )
                     else:  # 除了PDF, 其他附件可能一类多个
-                        self.db[self.collection[3]].update_one({'Anthology ID': item['Anthology ID']},
-                                                               {'$addToSet': {k: v}})
+                        self.db[self.collection[3]].update_one(
+                            {'Anthology ID': item['Anthology ID']},
+                            {'$addToSet': {k: v}}
+                            )
         else:
             print()
         return item
