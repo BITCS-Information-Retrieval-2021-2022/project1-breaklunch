@@ -17,15 +17,18 @@ class ACMSpider(scrapy.Spider):
     pdf_download_path = 'breaklunch/acm_pdf_download/'
     # 用于debug
     debug_flag = True
+    # 已爬取的url
+    url_done_list = []
 
     def start_requests(self):
+        # 已经爬取的url
+        with open('breaklunch/List/acm_done.txt', 'r', encoding='utf-8') as f:
+            self.url_done_list = f.read().splitlines()
+
         # 起始url，按ACM的subject分类，在此基础上按被引用量排序（引用量高的文章更有可能有视频）
         urls = [
-            # 'https://dl.acm.org/subject/ai?sortBy=cited&startPage=0&pageSize=50'
-            # 'https://dl.acm.org/subject/is?sortBy=cited&startPage=0&pageSize=50'
-            # 'https://dl.acm.org/subject/mobile?sortBy=cited&startPage=0&pageSize=50'
-            # 'https://dl.acm.org/subject/mobile?startPage=0&pageSize=50&sortBy=cited'
-            'https://dl.acm.org/subject/society?startPage=0&pageSize=50&sortBy=cited'
+            'https://dl.acm.org/subject/se?startPage=0&pageSize=50&sortBy=cited'
+            'https://dl.acm.org/subject/theory?startPage=0&pageSize=50&sortBy=cited'
         ]
 
         for url in urls:
@@ -41,13 +44,12 @@ class ACMSpider(scrapy.Spider):
             time.sleep(wait * 0.1)
             try:
                 paper_url = self.acm_prefix + paper_item.css('span.hlFld-Title a').attrib['href']
-                yield scrapy.Request(paper_url, callback=self.parse_paper_homepage, dont_filter=True)
+                if paper_url not in self.url_done_list:
+                    yield scrapy.Request(paper_url, callback=self.parse_paper_homepage, dont_filter=True)
+                else:
+                    self.log(f"论文{paper_url}爬过了，本次跳过。\n")
             except:
                 continue
-
-        # 爬完的页写入文档，以实现断点续爬
-        with open('breaklunch/List/acm_done.txt', 'a') as f:
-            f.write(response.url + '\n')
 
         # 爬取下一页论文列表
         next_page = response.css('a.pagination__btn--next').attrib['href']
@@ -102,19 +104,21 @@ class ACMSpider(scrapy.Spider):
             thumbnail_path = None
 
         # 获取pdf相关信息
-        pdf_red_button = response.css('a.btn.red')
         try:
-            if pdf_red_button is not None:
-                pdf_url = self.acm_prefix + pdf_red_button.attrib['href']
-                saved_title = title.replace('\\', '').replace('/', '').replace(':', '：')
-                saved_title = saved_title.replace('*', '').replace('?', '？').replace('"', '')
-                saved_title = saved_title.replace('<', '').replace('>', '').replace('|', '')
-                pdf_path = self.pdf_download_path + saved_title + '.pdf'
-                yield scrapy.Request(pdf_url, meta={'pdf_path': pdf_path},
-                                     callback=self.parse_pdf_download, dont_filter=True)
-            else:
-                pdf_url = None
-                pdf_path = None
+            pdf_red_button = response.css('a.btn.red')
+            pdf_url = self.acm_prefix + pdf_red_button.attrib['href']
+            # pdf_path = None
+
+            saved_title = title.replace('\\', '').replace('/', '').replace(':', '：')
+            saved_title = saved_title.replace('*', '').replace('?', '？').replace('"', '')
+            saved_title = saved_title.replace('<', '').replace('>', '').replace('|', '')
+            pdf_path = self.pdf_download_path + saved_title + '.pdf'
+
+            wait = random.randint(1, 5)
+            time.sleep(wait * 0.1)
+
+            yield scrapy.Request(pdf_url, meta={'pdf_path': pdf_path},
+                                 callback=self.parse_pdf_download, dont_filter=True)
         except KeyError:
             pdf_url = None
             pdf_path = None
