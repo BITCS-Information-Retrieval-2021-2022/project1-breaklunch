@@ -1,3 +1,5 @@
+
+
 # 项目介绍
 
 - 本项目实现了一个大规模爬虫系统，从**ACM**、**Springer**、**ScienceDirect**三个网站爬取含作者、摘要、会议、引文等论文相关信息的数据。
@@ -68,6 +70,7 @@
 
 1. git clone
 2. 安装上述项目依赖的Python第三方库
+2. 安装MongoDB
 3. 进入项目目录，终端输入scrapy crawl {spidername}
    - 例如：scrapy crawl acm
 
@@ -81,7 +84,27 @@
 
 #### 6.2.1 ACM
 
+- 爬虫工作流程
 
+  ACM数据库爬虫的工作流程主要分为收集论文列表URL和爬取论文信息两个步骤，爬虫的具体工作流程如下图所示：
+
+<img src="C:\Users\Holearow\AppData\Roaming\Typora\typora-user-images\image-20211225174217623.png" alt="image-20211225174217623" style="zoom: 50%;" />
+
+- 收集论文列表URL
+
+  ​	每一个论文列表包含50条论文的概况信息，可以从列表页中获取论文的URL，进一步爬取论文的详细信息，当一个列表页的论文全部爬取完毕后可以通过页面底部下一页指向的链接获取新的论文列表。按照这样的方法，我们通过三种方法收集初始页的论文列表URL：
+
+  - 通过ACM DL主页的Search by Subject版块获取初始列表URL；
+  - 通过ACM DL的期刊和会议列表获取初始列表URL；
+  - 通过ACM DL的搜索功能获取初始URL。
+
+- 爬取论文信息
+
+  ​	通过论文列表中获取的论文主页URL可以获取论文的信息：
+
+  - 论文的标题、摘要和doi等基本信息通过请求论文URL的response获取，并保存到MongoDB，唯一标识为论文的doi；
+  - 论文的pdf如果可以获取，将论文pdf保存到本地；
+  - 论文如有视频信息，从论文URL的response中获取video和thumbnail的URL保存到MongoDB。(为保证有视频的论文数量，收集的论文列表主要为带视频的论文列表，和按照cited数量排序的论文列表)
 
 #### 6.2.2 Springer
 
