@@ -149,9 +149,33 @@
 
 #### 6.2.3 ScienceDirect
 
+- 爬虫工作流程
+
+  Springer数据库爬虫的工作流程主要分为收集论文列表URL和爬取论文信息两个步骤，爬虫的具体工作流程与6.2.1相似。
+
+- 收集论文列表URL
+  ​	获取初始页的论文列表URL共分为以下三步：
+  - 在https://www.sciencedirect.com/browse/journals-and-books?page={1-12}&contentType=JL&accessType=openAccess页面获取所有刊物的页面链接
+  - 进入刊物页面，获取该刊物所有历史期刊
+  - 进入期刊页面，获取该期刊下所有文章链接
+
+- 爬取论文信息
+  ​	通过论文列表中获取的论文主页URL可以获取论文的信息：
+  - 论文的标题、摘要和doi等基本信息通过请求论文URL的response获取；
+  - 论文的引用数、被引用数通过异步请求XHR获取；
+  - 组装数据，保存到MongoDB，唯一标识为论文的doi。
 
 
-### 6.3 检索系统
+### 6.3 数据清洗
+
+为了加速爬取，本项目将URL目录分为多份，在多台机器爬取。为了进行kibana数据分析，还需将这些数据合并为同一数据源。
+
+- 把不同数据源的MongoDB Collection以Json格式分别导出
+- 创建总和Collection，并以doi作为唯一索引
+- 读取Json文件，将每条记录清洗为统一的数据格式，尝试插入总和Collection，这仅在doi唯一时发生。
+
+
+### 6.4 检索系统
 
 
 
