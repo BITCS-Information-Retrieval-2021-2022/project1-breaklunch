@@ -96,7 +96,7 @@
 
   - 通过ACM DL主页的Search by Subject版块获取初始列表URL；
   - 通过ACM DL的期刊和会议列表获取初始列表URL；
-  - 通过ACM DL的搜索功能获取初始URL。
+  - 通过ACM DL的搜索功能获取初始列表URL。
 
 - 爬取论文信息
 
