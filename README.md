@@ -24,9 +24,9 @@
 
 |     网站      | 数据总量 | 本地PDF数量 | 视频数量 |
 | :-----------: | :------: | :---------: | :------: |
-|      ACM      |          |             |          |
-|   Springer    |          |             |          |
-| ScienceDirect |          |             |          |
+|      ACM      |  460229  |    8415     |  18220   |
+|   Springer    | 1421228  |      -      |    -     |
+| ScienceDirect |  791428  |      -      |    -     |
 
 
 
@@ -177,6 +177,94 @@
 
 ### 6.4 检索系统
 
+#### 6.4.1 Elasticsearch搭建
 
+- 安装Elasticsearch
+
+  查看官网地址，下载安装对应平台的版本即可。
+
+- 启动Elasticsearch
+
+  进入Elasticsearch目录，终端输入
+
+  ```
+  ./bin/elasticsearch
+  ```
+
+  默认启动的是9200端口，可打开http://localhost:9200进行验证。
+
+- 安装管理界面
+
+  elasticsearch-head可以很方便的查看es集群状态，终端输入以下命令进行安装。
+
+  ```
+  git clone git://github.com/mobz/elasticsearch-head.git
+  cd elasticsearch-head
+  npm install
+  npm run start
+  ```
+
+  默认启动的是9100端口，可打开http://localhost:9100进行验证。
+
+#### 6.4.2 Kibana搭建
+
+- 安装Kibana
+
+  查看官网地址，下载对应平台的版本即可。
+
+- 启动Kibana
+
+  进入Kibana目录，终端输入
+
+  ```
+  ./bin/kibana
+  ```
+
+  默认启动的是5601端口，可打开http://localhost:5601进行验证。
+
+#### 6.4.3 MongoDB和Elasticsearch实时同步
+
+- 安装mongo-connector
+
+  ```
+  pip install mongo-connector
+  ```
+
+- 安装elastic2-doc-manager
+
+  ```
+  pip install elastic2-doc-manager
+  ```
+
+- mongo开启副本集
+
+  首先关闭正在运行的MongoDB服务，然后通过指定--replSet选项来启动MongoDB
+
+  ```
+  mongod --port "PORT" --dbpath "YOUR_DB_DATA_PATH" --replSet "REPLICA_SET_INSTANCE_NAME"
+  ```
+
+  另外打开一个终端，连接MongoDB服务，在MongoDB客户端使用命令来启动一个新的副本集
+
+  ```
+  >rs.initiate()
+  ```
+
+- 开启实时同步
+
+  终端中输入以下命令即可
+
+  ```
+  mongo-connector -m localhost:27017 -t localhost:9200 -d elastic2_doc_manager
+  ```
+
+#### 6.4.4 数据可视化
+
+- 在Kibana中添加自定义索引
+- 点击Kibana的Visualize菜单，进入可视化图表创建界面
+  - Kibana自带垂直条形图、水平条形图、饼图、折线图等10种图表
+- 使用Kibana的仪表盘展示保存的可视化结果集合
 
 ## 七、其他说明
+
+暂无
