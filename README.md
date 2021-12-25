@@ -88,7 +88,7 @@
 
   ACM数据库爬虫的工作流程主要分为收集论文列表URL和爬取论文信息两个步骤，爬虫的具体工作流程如下图所示：
 
-<img src="C:\Users\Holearow\AppData\Roaming\Typora\typora-user-images\image-20211225174217623.png" alt="image-20211225174217623" style="zoom: 50%;" />
+![image](https://github.com/BITCS-Information-Retrieval-2021-2022/project1-breaklunch/blob/main/extra/acm.png)
 
 - 收集论文列表URL
 
