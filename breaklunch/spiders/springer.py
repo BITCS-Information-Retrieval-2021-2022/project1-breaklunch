@@ -137,6 +137,6 @@ class SpringerSpider(scrapy.Spider):
         item['pdf_path'] = ''
 
         # 解析完成后将url加入已爬取目录
-        # with open(self.url_done_path, 'a', encoding='utf-8') as f:
-        #     f.write(response.url + "\n")
+        with open(self.url_done_path, 'a', encoding='utf-8') as f:
+            f.write(response.url + "\n")
         yield item
